@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07090f" />
+  <title>NOVA — Build Worlds With AI</title>
+  <meta name="description" content="NOVA is an AI-native social world platform. Describe a world, generate it instantly, and play together." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#07090f;--panel:rgba(15,18,29,.72);--line:rgba(255,255,255,.09);--text:#f7f8fb;--muted:#9aa4b2;--accent:#8b5cf6;--accent2:#22d3ee;--good:#34d399}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 50% -10%,#1b1b3b 0,#0a0c14 40%,#07090f 70%);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
+    canvas#stars{position:fixed;inset:0;z-index:-2;width:100%;height:100%}.grid{position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 80%)}
+    .shell{max-width:1180px;margin:auto;padding:0 24px}.nav{height:76px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;backdrop-filter:blur(18px);background:linear-gradient(to bottom,rgba(7,9,15,.9),rgba(7,9,15,.48));border-bottom:1px solid rgba(255,255,255,.04)}
+    .brand{font-family:'Space Grotesk';font-weight:700;letter-spacing:.18em}.brand span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;color:transparent}.navlinks{display:flex;gap:28px;color:#c7ced8;font-size:14px}.navlinks a{color:inherit;text-decoration:none}.pill{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:10px 16px;border-radius:999px;color:#fff;text-decoration:none;font-size:14px}
+    .hero{min-height:calc(100vh - 76px);display:grid;grid-template-columns:1.05fr .95fr;gap:46px;align-items:center;padding:72px 0 64px}.eyebrow{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.09);padding:8px 12px;border-radius:999px;font-size:13px;color:#d9ccff}.dot{width:7px;height:7px;background:var(--good);border-radius:50%;box-shadow:0 0 16px var(--good)}
+    h1{font-family:'Space Grotesk';font-size:clamp(52px,7vw,92px);line-height:.96;margin:22px 0 20px;letter-spacing:-.045em}.grad{background:linear-gradient(90deg,#fff 15%,#bda5ff 52%,#6fe7f6);-webkit-background-clip:text;color:transparent}.lead{font-size:20px;line-height:1.6;color:#aeb7c5;max-width:660px}.cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}.btn{border:0;border-radius:14px;padding:14px 19px;font-weight:700;cursor:pointer;font-size:15px}.primary{background:linear-gradient(135deg,#8b5cf6,#5b7cfa 58%,#22d3ee);color:#fff;box-shadow:0 16px 40px rgba(86,73,245,.28)}.secondary{background:rgba(255,255,255,.05);color:#fff;border:1px solid var(--line)}
+    .world-card{border:1px solid rgba(255,255,255,.12);border-radius:26px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));box-shadow:0 30px 100px rgba(0,0,0,.35);overflow:hidden;position:relative}.world-card:before{content:'';position:absolute;inset:-20%;background:radial-gradient(circle at 70% 30%,rgba(34,211,238,.18),transparent 27%),radial-gradient(circle at 30% 70%,rgba(139,92,246,.24),transparent 28%);filter:blur(20px)}
+    .preview{position:relative;min-height:520px;padding:18px;display:flex;flex-direction:column;justify-content:space-between}.topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#d0d8e4}.badge{padding:8px 10px;background:rgba(6,8,15,.72);border:1px solid rgba(255,255,255,.08);border-radius:10px}.orb{width:230px;height:230px;border-radius:50%;margin:auto;background:radial-gradient(circle at 35% 35%,#f1ebff 0 3%,#8b5cf6 18%,#3342a6 48%,#07111f 74%);box-shadow:0 0 80px rgba(139,92,246,.45),inset -30px -24px 55px rgba(0,0,0,.55);position:relative;animation:float 5s ease-in-out infinite}.orb:after{content:'';position:absolute;inset:14%;border:1px solid rgba(255,255,255,.25);border-radius:44% 56% 58% 42%/49% 41% 59% 51%;transform:rotate(26deg)}@keyframes float{50%{transform:translateY(-12px) rotate(2deg)}}
+    .promptbox{background:rgba(7,9,15,.84);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:12px;display:flex;gap:10px}.promptbox input{flex:1;border:0;outline:0;background:transparent;color:#fff;font-size:14px;padding:8px}.promptbox button{border:0;border-radius:12px;padding:10px 13px;background:#fff;color:#111827;font-weight:800;cursor:pointer}.hint{font-size:11px;color:#8a94a3;margin-top:8px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:8px 0 84px}.stat{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.stat b{display:block;font-size:21px}.stat span{font-size:12px;color:var(--muted)}
+    section{padding:84px 0}.section-title{font-family:'Space Grotesk';font-size:clamp(34px,5vw,58px);letter-spacing:-.03em;margin:0 0 12px}.section-copy{color:var(--muted);font-size:18px;max-width:720px;line-height:1.6}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}.card{padding:24px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));min-height:190px}.icon{font-size:28px}.card h3{margin:20px 0 9px}.card p{margin:0;color:var(--muted);line-height:1.55;font-size:14px}
+    .demo{border:1px solid var(--line);border-radius:24px;padding:22px;background:rgba(255,255,255,.025);margin-top:32px}.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.demo-panel{border:1px solid var(--line);border-radius:18px;background:#0c0f18;padding:18px;min-height:300px}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#121723;color:#c8d0dc;border-radius:999px;padding:8px 10px;font-size:12px;cursor:pointer}.terminal{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:#9ee6b8;white-space:pre-line;line-height:1.65}.world-list{display:grid;gap:10px}.world-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);background:#111621;border-radius:14px;padding:13px}.world-row small{color:var(--muted)}
+    footer{padding:50px 0 70px;border-top:1px solid var(--line);color:#8f99a8;font-size:13px}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    .toast{position:fixed;right:20px;bottom:20px;background:#111827;border:1px solid rgba(255,255,255,.12);padding:13px 16px;border-radius:14px;opacity:0;transform:translateY(10px);transition:.25s;z-index:50}.toast.show{opacity:1;transform:none}
+    @media(max-width:880px){.navlinks{display:none}.hero{grid-template-columns:1fr;padding-top:38px}.world-card{order:-1}.preview{min-height:420px}.orb{width:180px;height:180px}.stats{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr}.demo-grid{grid-template-columns:1fr}h1{font-size:58px}}
+    @media(max-width:520px){.shell{padding:0 16px}.hero{gap:28px}.world-card{border-radius:20px}.preview{min-height:390px}.lead{font-size:17px}.stats{margin-bottom:48px}.nav{height:64px}}
+  </style>
+</head>
+<body>
+<canvas id="stars"></canvas><div class="grid"></div>
+<div class="nav"><div class="shell" style="width:100%;display:flex;align-items:center;justify-content:space-between"><div class="brand">N<span>O</span>VA</div><div class="navlinks"><a href="#vision">Vision</a><a href="#engine">AI Engine</a><a href="#worlds">Worlds</a><a href="#economy">Economy</a></div><a class="pill" href="#engine">Enter Alpha</a></div></div>
+<main class="shell">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> AI-native universe · prototype live</div>
+      <h1>Imagine it.<br><span class="grad">Enter it.</span></h1>
+      <p class="lead">NOVA turns a sentence into a playable social world. Build cities, games, economies and stories with AI—then invite anyone instantly.</p>
+      <div class="cta"><button class="btn primary" onclick="document.querySelector('#worldPrompt').focus()">Create a world</button><button class="btn secondary" onclick="document.querySelector('#vision').scrollIntoView({behavior:'smooth'})">See the vision</button></div>
+    </div>
+    <div class="world-card">
+      <div class="preview">
+        <div class="topbar"><span class="badge">WORLD 01 · TOKYO 2049</span><span class="badge">● 12,481 online</span></div>
+        <div class="orb" id="orb"></div>
+        <div><div class="promptbox"><input id="worldPrompt" value="Build a floating cyberpunk city above Tokyo" aria-label="World prompt"><button id="generateBtn">Generate</button></div><div class="hint">Try: “a Mars colony for 10,000 players” or “medieval Indonesia with dragons”</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats"><div class="stat"><b>1 prompt</b><span>to create a world</span></div><div class="stat"><b>0 code</b><span>required for creators</span></div><div class="stat"><b>∞ worlds</b><span>generated by AI</span></div><div class="stat"><b>Any screen</b><span>mobile · web · XR</span></div></div>
+
+  <section id="vision"><h2 class="section-title">Not a game. A new layer of the internet.</h2><p class="section-copy">The product thesis is simple: every piece of content becomes a place you can enter. Instead of scrolling past videos, users step inside experiences built by people and AI.</p>
+    <div class="cards">
+      <div class="card"><div class="icon">✦</div><h3>Prompt → World</h3><p>Describe a place, game loop, NPCs and rules. The AI assembles the world in seconds.</p></div>
+      <div class="card"><div class="icon">◎</div><h3>Social by default</h3><p>Every world can host friends, communities, events and massive public sessions.</p></div>
+      <div class="card"><div class="icon">◇</div><h3>Infinite personalization</h3><p>The same world can adapt its quests, difficulty, characters and story to each player.</p></div>
+    </div>
+  </section>
+
+  <section id="engine"><h2 class="section-title">The AI World Engine</h2><p class="section-copy">This public alpha simulates the creator flow that should become the core growth loop: describe → generate → publish → remix.</p>
+    <div class="demo"><div class="demo-grid">
+      <div class="demo-panel"><h3 style="margin-top:0">World brief</h3><div class="chips"><button class="chip">Space colony</button><button class="chip">Future Jakarta</button><button class="chip">Fantasy kingdom</button><button class="chip">Survival island</button></div><textarea id="brief" style="width:100%;height:150px;margin-top:16px;border-radius:14px;border:1px solid var(--line);background:#080b12;color:white;padding:14px;resize:none">Create a neon future city where players can race flying bikes, own apartments, build businesses and meet AI characters.</textarea><button class="btn primary" id="compileBtn" style="margin-top:12px;width:100%">Compile World</button></div>
+      <div class="demo-panel"><h3 style="margin-top:0">AI build log</h3><div class="terminal" id="terminal">$ waiting for world brief...
+✓ semantic world parser ready
+✓ multiplayer schema ready
+✓ NPC behavior system ready
+✓ creator economy hooks ready</div></div>
+    </div></div>
+  </section>
+
+  <section id="worlds"><h2 class="section-title">Worlds become the feed.</h2><p class="section-copy">A mobile user should open NOVA and jump into experiences as easily as swiping a short video.</p><div class="world-list" style="margin-top:30px">
+    <div class="world-row"><div><b>Tokyo 2049</b><br><small>Open city · racing · business</small></div><span>12.4K live</span></div>
+    <div class="world-row"><div><b>Archipelago Zero</b><br><small>Indonesia · survival · co-op</small></div><span>8.1K live</span></div>
+    <div class="world-row"><div><b>Mars First City</b><br><small>Strategy · economy · civilization</small></div><span>6.7K live</span></div>
+  </div></section>
+
+  <section id="economy"><h2 class="section-title">Creators own the upside.</h2><p class="section-copy">Players become creators. Creators can publish worlds, sell cosmetic items, charge for premium experiences and earn from successful communities.</p><div class="cards"><div class="card"><div class="icon">⚡</div><h3>Instant creation</h3><p>AI removes the coding barrier, expanding the creator base from millions to potentially billions.</p></div><div class="card"><div class="icon">◈</div><h3>Remix economy</h3><p>Any public world can become a template that others remix, improve and share.</p></div><div class="card"><div class="icon">↗</div><h3>Network effects</h3><p>More players attract creators; more creators produce worlds; more worlds attract players.</p></div></div></section>
+</main>
+<footer><div class="shell foot"><div><div class="brand">N<span>O</span>VA</div><div style="margin-top:10px">AI World Platform · public prototype</div></div><div>Built for the next billion players.</div></div></footer>
+<div class="toast" id="toast">World generation started.</div>
+<script>
+  const c=document.getElementById('stars'),ctx=c.getContext('2d');let stars=[];function resize(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);stars=Array.from({length:Math.min(180,Math.floor(innerWidth/7))},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.2,v:Math.random()*.13+.02}))}function loop(){ctx.clearRect(0,0,innerWidth,innerHeight);ctx.fillStyle='rgba(255,255,255,.72)';for(const s of stars){s.y+=s.v;if(s.y>innerHeight)s.y=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}requestAnimationFrame(loop)}addEventListener('resize',resize);resize();loop();
+  const toast=document.getElementById('toast');function showToast(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2100)}
+  document.getElementById('generateBtn').onclick=()=>{const v=document.getElementById('worldPrompt').value.trim();document.getElementById('orb').style.filter='hue-rotate('+Math.floor(Math.random()*220)+'deg)';showToast(v?`Generating: ${v}`:'Describe a world first');};
+  document.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{document.getElementById('brief').value='Create '+ch.textContent.toLowerCase()+' with social multiplayer, AI characters, exploration, progression and a player economy.'});
+  document.getElementById('compileBtn').onclick=()=>{const t=document.getElementById('terminal');const lines=['$ parsing world brief...','✓ terrain and city layout generated','✓ 18 AI NPC archetypes created','✓ movement + multiplayer rules compiled','✓ economy + inventory initialized','✓ quests generated from player profile','✓ world package ready','→ publish target: NOVA WORLD NETWORK'];t.textContent='';let i=0;const id=setInterval(()=>{t.textContent+=lines[i]+'\n';i++;if(i===lines.length){clearInterval(id);showToast('World compiled successfully')}} ,240)};
+</script>
+</body>
+</html>
