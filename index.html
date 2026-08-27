@@ -1,91 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#07090f" />
-  <title>NOVA — Build Worlds With AI</title>
-  <meta name="description" content="NOVA is an AI-native social world platform. Describe a world, generate it instantly, and play together." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{--bg:#07090f;--panel:rgba(15,18,29,.72);--line:rgba(255,255,255,.09);--text:#f7f8fb;--muted:#9aa4b2;--accent:#8b5cf6;--accent2:#22d3ee;--good:#34d399}
-    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 50% -10%,#1b1b3b 0,#0a0c14 40%,#07090f 70%);color:var(--text);font-family:Inter,system-ui,sans-serif;overflow-x:hidden}
-    canvas#stars{position:fixed;inset:0;z-index:-2;width:100%;height:100%}.grid{position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 80%)}
-    .shell{max-width:1180px;margin:auto;padding:0 24px}.nav{height:76px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;backdrop-filter:blur(18px);background:linear-gradient(to bottom,rgba(7,9,15,.9),rgba(7,9,15,.48));border-bottom:1px solid rgba(255,255,255,.04)}
-    .brand{font-family:'Space Grotesk';font-weight:700;letter-spacing:.18em}.brand span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;color:transparent}.navlinks{display:flex;gap:28px;color:#c7ced8;font-size:14px}.navlinks a{color:inherit;text-decoration:none}.pill{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:10px 16px;border-radius:999px;color:#fff;text-decoration:none;font-size:14px}
-    .hero{min-height:calc(100vh - 76px);display:grid;grid-template-columns:1.05fr .95fr;gap:46px;align-items:center;padding:72px 0 64px}.eyebrow{display:inline-flex;gap:8px;align-items:center;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.09);padding:8px 12px;border-radius:999px;font-size:13px;color:#d9ccff}.dot{width:7px;height:7px;background:var(--good);border-radius:50%;box-shadow:0 0 16px var(--good)}
-    h1{font-family:'Space Grotesk';font-size:clamp(52px,7vw,92px);line-height:.96;margin:22px 0 20px;letter-spacing:-.045em}.grad{background:linear-gradient(90deg,#fff 15%,#bda5ff 52%,#6fe7f6);-webkit-background-clip:text;color:transparent}.lead{font-size:20px;line-height:1.6;color:#aeb7c5;max-width:660px}.cta{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}.btn{border:0;border-radius:14px;padding:14px 19px;font-weight:700;cursor:pointer;font-size:15px}.primary{background:linear-gradient(135deg,#8b5cf6,#5b7cfa 58%,#22d3ee);color:#fff;box-shadow:0 16px 40px rgba(86,73,245,.28)}.secondary{background:rgba(255,255,255,.05);color:#fff;border:1px solid var(--line)}
-    .world-card{border:1px solid rgba(255,255,255,.12);border-radius:26px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));box-shadow:0 30px 100px rgba(0,0,0,.35);overflow:hidden;position:relative}.world-card:before{content:'';position:absolute;inset:-20%;background:radial-gradient(circle at 70% 30%,rgba(34,211,238,.18),transparent 27%),radial-gradient(circle at 30% 70%,rgba(139,92,246,.24),transparent 28%);filter:blur(20px)}
-    .preview{position:relative;min-height:520px;padding:18px;display:flex;flex-direction:column;justify-content:space-between}.topbar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#d0d8e4}.badge{padding:8px 10px;background:rgba(6,8,15,.72);border:1px solid rgba(255,255,255,.08);border-radius:10px}.orb{width:230px;height:230px;border-radius:50%;margin:auto;background:radial-gradient(circle at 35% 35%,#f1ebff 0 3%,#8b5cf6 18%,#3342a6 48%,#07111f 74%);box-shadow:0 0 80px rgba(139,92,246,.45),inset -30px -24px 55px rgba(0,0,0,.55);position:relative;animation:float 5s ease-in-out infinite}.orb:after{content:'';position:absolute;inset:14%;border:1px solid rgba(255,255,255,.25);border-radius:44% 56% 58% 42%/49% 41% 59% 51%;transform:rotate(26deg)}@keyframes float{50%{transform:translateY(-12px) rotate(2deg)}}
-    .promptbox{background:rgba(7,9,15,.84);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:12px;display:flex;gap:10px}.promptbox input{flex:1;border:0;outline:0;background:transparent;color:#fff;font-size:14px;padding:8px}.promptbox button{border:0;border-radius:12px;padding:10px 13px;background:#fff;color:#111827;font-weight:800;cursor:pointer}.hint{font-size:11px;color:#8a94a3;margin-top:8px}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:8px 0 84px}.stat{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.stat b{display:block;font-size:21px}.stat span{font-size:12px;color:var(--muted)}
-    section{padding:84px 0}.section-title{font-family:'Space Grotesk';font-size:clamp(34px,5vw,58px);letter-spacing:-.03em;margin:0 0 12px}.section-copy{color:var(--muted);font-size:18px;max-width:720px;line-height:1.6}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}.card{padding:24px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));min-height:190px}.icon{font-size:28px}.card h3{margin:20px 0 9px}.card p{margin:0;color:var(--muted);line-height:1.55;font-size:14px}
-    .demo{border:1px solid var(--line);border-radius:24px;padding:22px;background:rgba(255,255,255,.025);margin-top:32px}.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.demo-panel{border:1px solid var(--line);border-radius:18px;background:#0c0f18;padding:18px;min-height:300px}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#121723;color:#c8d0dc;border-radius:999px;padding:8px 10px;font-size:12px;cursor:pointer}.terminal{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:#9ee6b8;white-space:pre-line;line-height:1.65}.world-list{display:grid;gap:10px}.world-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);background:#111621;border-radius:14px;padding:13px}.world-row small{color:var(--muted)}
-    footer{padding:50px 0 70px;border-top:1px solid var(--line);color:#8f99a8;font-size:13px}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
-    .toast{position:fixed;right:20px;bottom:20px;background:#111827;border:1px solid rgba(255,255,255,.12);padding:13px 16px;border-radius:14px;opacity:0;transform:translateY(10px);transition:.25s;z-index:50}.toast.show{opacity:1;transform:none}
-    @media(max-width:880px){.navlinks{display:none}.hero{grid-template-columns:1fr;padding-top:38px}.world-card{order:-1}.preview{min-height:420px}.orb{width:180px;height:180px}.stats{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr}.demo-grid{grid-template-columns:1fr}h1{font-size:58px}}
-    @media(max-width:520px){.shell{padding:0 16px}.hero{gap:28px}.world-card{border-radius:20px}.preview{min-height:390px}.lead{font-size:17px}.stats{margin-bottom:48px}.nav{height:64px}}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<meta name="theme-color" content="#050711" />
+<title>NOVA World</title>
+<style>
+:root{--bg:#050711;--glass:rgba(8,12,25,.72);--line:rgba(255,255,255,.12);--text:#f8fbff;--muted:#9ba7bb;--cyan:#67e8f9;--violet:#9b87f5;--green:#65f2ae;--warn:#ffd166}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{color:inherit}#game{position:fixed;inset:0;width:100%;height:100%;display:block;background:#08101a;touch-action:none}.ui{position:fixed;inset:0;pointer-events:none}.glass{background:var(--glass);border:1px solid var(--line);box-shadow:0 14px 45px rgba(0,0,0,.24);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.topbar{position:absolute;left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right));top:max(14px,env(safe-area-inset-top));display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.brand{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px}.brandmark{width:31px;height:31px;border-radius:11px;background:radial-gradient(circle at 35% 30%,#fff 0 5%,#9b87f5 22%,#4b7cff 55%,#111a3a 100%);box-shadow:0 0 25px rgba(130,102,255,.55)}.brand b{letter-spacing:.18em;font-size:13px}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.stats{display:flex;gap:8px}.stat{padding:9px 11px;border-radius:14px;min-width:76px;text-align:center}.stat b{display:block;font-size:14px}.stat span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.09em;margin-top:2px}.quest{position:absolute;right:max(14px,env(safe-area-inset-right));top:92px;width:min(290px,calc(100vw - 28px));padding:14px;border-radius:18px}.quest h3{font-size:12px;margin:0 0 9px;letter-spacing:.08em}.questline{font-size:11px;color:#c7d0df;margin:7px 0;display:flex;justify-content:space-between;gap:10px}.questline.done{color:var(--green)}.bar{height:5px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:10px}.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--cyan));transition:.3s}.tip{position:absolute;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);padding:8px 12px;border-radius:999px;font-size:11px;color:#dce7f6;opacity:.95;transition:.25s;white-space:nowrap}.minimap{position:absolute;left:max(14px,env(safe-area-inset-left));top:92px;width:132px;height:132px;border-radius:18px;overflow:hidden}.minimap canvas{width:100%;height:100%;display:block}.controls{position:absolute;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:8px;pointer-events:auto}.action{height:46px;min-width:82px;padding:0 14px;border:1px solid var(--line);border-radius:15px;background:rgba(8,12,25,.82);backdrop-filter:blur(14px);cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.24)}.action b{display:block;font-size:11px}.action small{display:block;color:var(--muted);font-size:9px;margin-top:2px}.action.active{border-color:rgba(103,232,249,.6);box-shadow:0 0 0 1px rgba(103,232,249,.15),0 0 32px rgba(103,232,249,.15)}
+.ai{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);width:min(650px,calc(100vw - 32px));display:flex;gap:8px;padding:8px;border-radius:16px;pointer-events:auto}.ai input{flex:1;min-width:0;border:0;outline:0;color:#fff;background:transparent;padding:7px 9px;font-size:12px}.ai button{border:0;border-radius:11px;padding:9px 12px;background:linear-gradient(135deg,#8b5cf6,#27c7e8);font-weight:800;font-size:11px;cursor:pointer}.toast{position:absolute;left:50%;top:21%;transform:translate(-50%,-8px);padding:10px 14px;border-radius:14px;font-size:12px;opacity:0;transition:.25s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.mobile{display:none}.joy{position:absolute;left:22px;bottom:112px;width:118px;height:118px;border-radius:50%;pointer-events:auto;touch-action:none}.joy:before{content:"";position:absolute;inset:19px;border:1px solid rgba(255,255,255,.12);border-radius:50%}.knob{position:absolute;left:39px;top:39px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.28)}.mBtns{position:absolute;right:18px;bottom:108px;display:grid;grid-template-columns:58px 58px;gap:8px;pointer-events:auto}.mBtn{width:58px;height:58px;border-radius:50%;border:1px solid var(--line);background:rgba(8,12,25,.8);backdrop-filter:blur(12px);font-weight:800;font-size:10px}.mBtn.big{grid-row:span 2;height:124px;border-radius:30px}.help{position:absolute;left:max(14px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));padding:8px 11px;border-radius:13px;color:var(--muted);font-size:9px;line-height:1.45}.crosshair{position:absolute;left:50%;top:50%;width:18px;height:18px;transform:translate(-50%,-50%);opacity:.33}.crosshair:before,.crosshair:after{content:"";position:absolute;background:#fff}.crosshair:before{left:8px;top:0;width:2px;height:18px}.crosshair:after{left:0;top:8px;width:18px;height:2px}
+@media(max-width:780px){.desktopOnly{display:none}.mobile{display:block}.topbar{top:max(10px,env(safe-area-inset-top))}.brand{padding:8px 10px}.brandmark{width:27px;height:27px}.stats{gap:5px}.stat{min-width:58px;padding:8px 7px}.stat:nth-child(3){display:none}.quest{top:76px;right:10px;width:206px;padding:11px}.questline{font-size:9px}.minimap{width:94px;height:94px;top:76px;left:10px}.ai{bottom:23px;width:calc(100vw - 190px);left:50%;min-width:185px}.ai input{font-size:10px}.ai button{padding:8px 10px}.tip{top:181px;font-size:9px;max-width:88vw;overflow:hidden;text-overflow:ellipsis}.controls,.help{display:none}.toast{top:30%}}
+@media(max-width:520px){.quest{width:188px}.stat{min-width:52px}.brand small{display:none}.ai{width:calc(100vw - 182px);bottom:20px}.ai input{padding:6px}.ai button{font-size:0;width:36px}.ai button:after{content:"AI";font-size:10px}.joy{left:14px;bottom:89px}.mBtns{right:12px;bottom:88px}}
+</style>
 </head>
 <body>
-<canvas id="stars"></canvas><div class="grid"></div>
-<div class="nav"><div class="shell" style="width:100%;display:flex;align-items:center;justify-content:space-between"><div class="brand">N<span>O</span>VA</div><div class="navlinks"><a href="#vision">Vision</a><a href="#engine">AI Engine</a><a href="#worlds">Worlds</a><a href="#economy">Economy</a></div><a class="pill" href="#engine">Enter Alpha</a></div></div>
-<main class="shell">
-  <section class="hero">
-    <div>
-      <div class="eyebrow"><span class="dot"></span> AI-native universe · prototype live</div>
-      <h1>Imagine it.<br><span class="grad">Enter it.</span></h1>
-      <p class="lead">NOVA turns a sentence into a playable social world. Build cities, games, economies and stories with AI—then invite anyone instantly.</p>
-      <div class="cta"><button class="btn primary" onclick="document.querySelector('#worldPrompt').focus()">Create a world</button><button class="btn secondary" onclick="document.querySelector('#vision').scrollIntoView({behavior:'smooth'})">See the vision</button></div>
+<canvas id="game"></canvas>
+<div class="ui">
+  <div class="topbar">
+    <div class="brand glass"><div class="brandmark"></div><div><b>NOVA</b><small>WORLD // LIVE ALPHA</small></div></div>
+    <div class="stats">
+      <div class="stat glass"><b id="shards">0</b><span>shards</span></div>
+      <div class="stat glass"><b id="energy">100</b><span>energy</span></div>
+      <div class="stat glass"><b id="level">1</b><span>level</span></div>
     </div>
-    <div class="world-card">
-      <div class="preview">
-        <div class="topbar"><span class="badge">WORLD 01 · TOKYO 2049</span><span class="badge">● 12,481 online</span></div>
-        <div class="orb" id="orb"></div>
-        <div><div class="promptbox"><input id="worldPrompt" value="Build a floating cyberpunk city above Tokyo" aria-label="World prompt"><button id="generateBtn">Generate</button></div><div class="hint">Try: “a Mars colony for 10,000 players” or “medieval Indonesia with dragons”</div></div>
-      </div>
-    </div>
-  </section>
-
-  <div class="stats"><div class="stat"><b>1 prompt</b><span>to create a world</span></div><div class="stat"><b>0 code</b><span>required for creators</span></div><div class="stat"><b>∞ worlds</b><span>generated by AI</span></div><div class="stat"><b>Any screen</b><span>mobile · web · XR</span></div></div>
-
-  <section id="vision"><h2 class="section-title">Not a game. A new layer of the internet.</h2><p class="section-copy">The product thesis is simple: every piece of content becomes a place you can enter. Instead of scrolling past videos, users step inside experiences built by people and AI.</p>
-    <div class="cards">
-      <div class="card"><div class="icon">✦</div><h3>Prompt → World</h3><p>Describe a place, game loop, NPCs and rules. The AI assembles the world in seconds.</p></div>
-      <div class="card"><div class="icon">◎</div><h3>Social by default</h3><p>Every world can host friends, communities, events and massive public sessions.</p></div>
-      <div class="card"><div class="icon">◇</div><h3>Infinite personalization</h3><p>The same world can adapt its quests, difficulty, characters and story to each player.</p></div>
-    </div>
-  </section>
-
-  <section id="engine"><h2 class="section-title">The AI World Engine</h2><p class="section-copy">This public alpha simulates the creator flow that should become the core growth loop: describe → generate → publish → remix.</p>
-    <div class="demo"><div class="demo-grid">
-      <div class="demo-panel"><h3 style="margin-top:0">World brief</h3><div class="chips"><button class="chip">Space colony</button><button class="chip">Future Jakarta</button><button class="chip">Fantasy kingdom</button><button class="chip">Survival island</button></div><textarea id="brief" style="width:100%;height:150px;margin-top:16px;border-radius:14px;border:1px solid var(--line);background:#080b12;color:white;padding:14px;resize:none">Create a neon future city where players can race flying bikes, own apartments, build businesses and meet AI characters.</textarea><button class="btn primary" id="compileBtn" style="margin-top:12px;width:100%">Compile World</button></div>
-      <div class="demo-panel"><h3 style="margin-top:0">AI build log</h3><div class="terminal" id="terminal">$ waiting for world brief...
-✓ semantic world parser ready
-✓ multiplayer schema ready
-✓ NPC behavior system ready
-✓ creator economy hooks ready</div></div>
-    </div></div>
-  </section>
-
-  <section id="worlds"><h2 class="section-title">Worlds become the feed.</h2><p class="section-copy">A mobile user should open NOVA and jump into experiences as easily as swiping a short video.</p><div class="world-list" style="margin-top:30px">
-    <div class="world-row"><div><b>Tokyo 2049</b><br><small>Open city · racing · business</small></div><span>12.4K live</span></div>
-    <div class="world-row"><div><b>Archipelago Zero</b><br><small>Indonesia · survival · co-op</small></div><span>8.1K live</span></div>
-    <div class="world-row"><div><b>Mars First City</b><br><small>Strategy · economy · civilization</small></div><span>6.7K live</span></div>
-  </div></section>
-
-  <section id="economy"><h2 class="section-title">Creators own the upside.</h2><p class="section-copy">Players become creators. Creators can publish worlds, sell cosmetic items, charge for premium experiences and earn from successful communities.</p><div class="cards"><div class="card"><div class="icon">⚡</div><h3>Instant creation</h3><p>AI removes the coding barrier, expanding the creator base from millions to potentially billions.</p></div><div class="card"><div class="icon">◈</div><h3>Remix economy</h3><p>Any public world can become a template that others remix, improve and share.</p></div><div class="card"><div class="icon">↗</div><h3>Network effects</h3><p>More players attract creators; more creators produce worlds; more worlds attract players.</p></div></div></section>
-</main>
-<footer><div class="shell foot"><div><div class="brand">N<span>O</span>VA</div><div style="margin-top:10px">AI World Platform · public prototype</div></div><div>Built for the next billion players.</div></div></footer>
-<div class="toast" id="toast">World generation started.</div>
+  </div>
+  <div class="minimap glass"><canvas id="map"></canvas></div>
+  <div class="quest glass">
+    <h3>FIRST SIGNAL</h3>
+    <div id="q1" class="questline"><span>Collect 8 shards</span><b>0/8</b></div>
+    <div id="q2" class="questline"><span>Build a beacon</span><b>0/1</b></div>
+    <div id="q3" class="questline"><span>Talk to a wanderer</span><b>0/1</b></div>
+    <div class="bar"><i id="questBar"></i></div>
+  </div>
+  <div id="tip" class="tip glass">WASD / arrows to move · E pulse · B build · Shift dash</div>
+  <div class="crosshair desktopOnly"></div>
+  <div class="ai glass"><input id="aiInput" autocomplete="off" placeholder="Tell the world AI: neon night, rain, spawn wanderers, forest..."/><button id="aiBtn">World AI</button></div>
+  <div class="controls desktopOnly">
+    <button id="pulseBtn" class="action"><b>Pulse</b><small>E</small></button>
+    <button id="buildBtn" class="action"><b>Build</b><small>B · 5 shards</small></button>
+    <button id="dashBtn" class="action"><b>Dash</b><small>Shift</small></button>
+  </div>
+  <div class="help glass desktopOnly">Move: WASD / arrows<br>Pulse: E · Build: B + click<br>Dash: Shift · AI: type below</div>
+  <div class="mobile">
+    <div id="joy" class="joy glass"><div id="knob" class="knob"></div></div>
+    <div class="mBtns"><button id="mPulse" class="mBtn">PULSE</button><button id="mBuild" class="mBtn big">BUILD</button><button id="mDash" class="mBtn">DASH</button></div>
+  </div>
+  <div id="toast" class="toast glass"></div>
+</div>
 <script>
-  const c=document.getElementById('stars'),ctx=c.getContext('2d');let stars=[];function resize(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);stars=Array.from({length:Math.min(180,Math.floor(innerWidth/7))},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.4+.2,v:Math.random()*.13+.02}))}function loop(){ctx.clearRect(0,0,innerWidth,innerHeight);ctx.fillStyle='rgba(255,255,255,.72)';for(const s of stars){s.y+=s.v;if(s.y>innerHeight)s.y=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}requestAnimationFrame(loop)}addEventListener('resize',resize);resize();loop();
-  const toast=document.getElementById('toast');function showToast(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2100)}
-  document.getElementById('generateBtn').onclick=()=>{const v=document.getElementById('worldPrompt').value.trim();document.getElementById('orb').style.filter='hue-rotate('+Math.floor(Math.random()*220)+'deg)';showToast(v?`Generating: ${v}`:'Describe a world first');};
-  document.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{document.getElementById('brief').value='Create '+ch.textContent.toLowerCase()+' with social multiplayer, AI characters, exploration, progression and a player economy.'});
-  document.getElementById('compileBtn').onclick=()=>{const t=document.getElementById('terminal');const lines=['$ parsing world brief...','✓ terrain and city layout generated','✓ 18 AI NPC archetypes created','✓ movement + multiplayer rules compiled','✓ economy + inventory initialized','✓ quests generated from player profile','✓ world package ready','→ publish target: NOVA WORLD NETWORK'];t.textContent='';let i=0;const id=setInterval(()=>{t.textContent+=lines[i]+'\n';i++;if(i===lines.length){clearInterval(id);showToast('World compiled successfully')}} ,240)};
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d',{alpha:false});
+const mini=document.getElementById('map'),mctx=mini.getContext('2d');
+const DPR=Math.min(devicePixelRatio||1,2),TAU=Math.PI*2;
+let W=innerWidth,H=innerHeight,last=performance.now(),time=0,buildMode=false,weather='clear',theme='neon';
+let view={x:0,y:0};
+const world={w:4200,h:4200,seed:783214,crystals:[],npcs:[],structures:[],particles:[]};
+const player={x:2100,y:2100,r:16,speed:245,shards:0,energy:100,level:1,dir:0,dash:0,pulse:0};
+const quest={collect:0,build:0,talk:0,complete:false};
+const keys=new Set(),input={x:0,y:0};
+function rng(n){const x=Math.sin(n*12.9898+world.seed*78.233)*43758.5453;return x-Math.floor(x)}
+function resize(){W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);mini.width=132*DPR;mini.height=132*DPR;mctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',resize);resize();
+function generate(){world.crystals=[];world.npcs=[];for(let i=0;i<115;i++){world.crystals.push({x:120+rng(i*7+1)*(world.w-240),y:120+rng(i*11+3)*(world.h-240),r:8+rng(i)*5,t:rng(i*17)*TAU,alive:true})}for(let i=0;i<18;i++){world.npcs.push({x:300+rng(i*19+2)*(world.w-600),y:300+rng(i*23+4)*(world.h-600),vx:0,vy:0,t:rng(i)*9,name:['Mira','Kiro','Aya','Zen','Nox','Lumi'][i%6],spoken:false,hue:175+(i*27)%130})}}
+generate();
+function load(){try{const s=JSON.parse(localStorage.getItem('nova-world-v2'));if(!s)return;Object.assign(player,s.player||{});Object.assign(quest,s.quest||{});world.structures=Array.isArray(s.structures)?s.structures:[];theme=s.theme||theme;weather=s.weather||weather}catch(e){}}
+function save(){localStorage.setItem('nova-world-v2',JSON.stringify({player:{x:player.x,y:player.y,shards:player.shards,energy:player.energy,level:player.level},quest,structures:world.structures.slice(-80),theme,weather}))}
+load();setInterval(save,4500);addEventListener('beforeunload',save);
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1900)}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function bgColor(){return theme==='desert'?'#1b1712':theme==='forest'?'#071510':theme==='ice'?'#0c1620':'#060a14'}
+function tileColor(x,y){const n=rng(Math.floor(x/190)*771+Math.floor(y/190)*313);if(theme==='desert')return n>.67?'#2c2216':n>.34?'#251d14':'#201911';if(theme==='forest')return n>.67?'#0d2519':n>.34?'#0a1e15':'#081810';if(theme==='ice')return n>.67?'#183141':n>.34?'#132a38':'#10222e';return n>.67?'#11162b':n>.34?'#0d1425':'#0a1020'}
+function sx(x){return x-view.x+W/2}function sy(y){return y-view.y+H/2}
+function update(dt){time+=dt;let dx=0,dy=0;if(keys.has('w')||keys.has('arrowup'))dy--;if(keys.has('s')||keys.has('arrowdown'))dy++;if(keys.has('a')||keys.has('arrowleft'))dx--;if(keys.has('d')||keys.has('arrowright'))dx++;dx+=input.x;dy+=input.y;const mag=Math.hypot(dx,dy)||1;dx/=mag;dy/=mag;if(Math.abs(dx)+Math.abs(dy)>.03)player.dir=Math.atan2(dy,dx);const boost=player.dash>0?2.35:1;player.x=clamp(player.x+dx*player.speed*boost*dt,35,world.w-35);player.y=clamp(player.y+dy*player.speed*boost*dt,35,world.h-35);player.dash=Math.max(0,player.dash-dt);player.pulse=Math.max(0,player.pulse-dt);player.energy=Math.min(100,player.energy+12*dt);view.x+=(player.x-view.x)*Math.min(1,dt*8);view.y+=(player.y-view.y)*Math.min(1,dt*8);
+for(const c of world.crystals){if(!c.alive)continue;c.t+=dt*1.8;if(Math.hypot(c.x-player.x,c.y-player.y)<28){c.alive=false;player.shards++;quest.collect=Math.min(8,quest.collect+1);burst(c.x,c.y,'#7ef9ff',9);toast('+1 energy shard')}}
+for(let i=0;i<world.npcs.length;i++){const n=world.npcs[i];n.t-=dt;if(n.t<=0){const a=rng(i*1000+Math.floor(time*2))*TAU;n.vx=Math.cos(a)*(22+rng(i+time)*35);n.vy=Math.sin(a)*(22+rng(i+time+9)*35);n.t=2+rng(i+Math.floor(time))*4}n.x=clamp(n.x+n.vx*dt,60,world.w-60);n.y=clamp(n.y+n.vy*dt,60,world.h-60)}
+for(let i=world.particles.length-1;i>=0;i--){const p=world.particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;p.vx*=.985;p.vy*=.985;if(p.life<=0)world.particles.splice(i,1)}
+updateQuest();}
+function burst(x,y,color,n=12){for(let i=0;i<n;i++){const a=Math.random()*TAU,s=30+Math.random()*90;world.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.45+Math.random()*.55,color})}}
+function pulse(){if(player.energy<14){toast('Not enough energy');return}player.energy-=14;player.pulse=.48;burst(player.x,player.y,'#8cecff',24);let hit=false;for(const c of world.crystals){if(c.alive&&dist(c,player)<115){c.alive=false;player.shards++;quest.collect=Math.min(8,quest.collect+1);burst(c.x,c.y,'#7ef9ff',7);hit=true}}let closest=null,cd=999;for(const n of world.npcs){const d=dist(n,player);if(d<100&&d<cd){closest=n;cd=d}}if(closest){closest.spoken=true;quest.talk=1;toast(closest.name+': “The world is listening.”');hit=true}if(!hit)toast('Pulse scanned nearby space')}
+function dash(){if(player.energy<22){toast('Not enough energy');return}player.energy-=22;player.dash=.3;burst(player.x,player.y,'#b79cff',18)}
+function toggleBuild(){buildMode=!buildMode;document.getElementById('buildBtn').classList.toggle('active',buildMode);toast(buildMode?'Build mode: click a location':'Build mode off')}
+function placeBeacon(wx,wy){if(player.shards<5){toast('Need 5 shards to build');return}if(Math.hypot(wx-player.x,wy-player.y)>330){toast('Build closer to your explorer');return}player.shards-=5;world.structures.push({x:wx,y:wy,t:Date.now(),kind:'beacon'});quest.build=1;burst(wx,wy,'#b99cff',25);toast('Signal beacon constructed');buildMode=false;document.getElementById('buildBtn').classList.remove('active');save()}
+function updateQuest(){const done=[quest.collect>=8,quest.build>=1,quest.talk>=1],pct=done.filter(Boolean).length/3*100;document.getElementById('q1').innerHTML='<span>Collect 8 shards</span><b>'+Math.min(quest.collect,8)+'/8</b>';document.getElementById('q2').innerHTML='<span>Build a beacon</span><b>'+quest.build+'/1</b>';document.getElementById('q3').innerHTML='<span>Talk to a wanderer</span><b>'+quest.talk+'/1</b>';['q1','q2','q3'].forEach((id,i)=>document.getElementById(id).classList.toggle('done',done[i]));document.getElementById('questBar').style.width=pct+'%';if(pct===100&&!quest.complete){quest.complete=true;player.level++;player.energy=100;player.shards+=10;toast('Quest complete · Level '+player.level+' · +10 shards');burst(player.x,player.y,'#65f2ae',40);save()}document.getElementById('shards').textContent=player.shards;document.getElementById('energy').textContent=Math.floor(player.energy);document.getElementById('level').textContent=player.level}
+function draw(){ctx.fillStyle=bgColor();ctx.fillRect(0,0,W,H);const tile=190,startX=Math.floor((view.x-W/2)/tile)*tile,startY=Math.floor((view.y-H/2)/tile)*tile;for(let x=startX;x<view.x+W/2+tile;x+=tile)for(let y=startY;y<view.y+H/2+tile;y+=tile){ctx.fillStyle=tileColor(x,y);ctx.fillRect(sx(x),sy(y),tile+1,tile+1);ctx.strokeStyle='rgba(255,255,255,.025)';ctx.strokeRect(sx(x),sy(y),tile,tile)}
+ctx.globalAlpha=.35;for(let i=0;i<90;i++){const x=(rng(i*43)*world.w),y=(rng(i*91+3)*world.h),X=sx(x),Y=sy(y);if(X<-20||Y<-20||X>W+20||Y>H+20)continue;ctx.fillStyle=theme==='forest'?'#2d8d61':theme==='desert'?'#b88848':theme==='ice'?'#9ad7ed':'#5166a4';ctx.beginPath();ctx.arc(X,Y,2+rng(i)*4,0,TAU);ctx.fill()}ctx.globalAlpha=1;
+for(const s of world.structures){const X=sx(s.x),Y=sy(s.y);if(X<-80||Y<-80||X>W+80||Y>H+80)continue;drawBeacon(X,Y,s)}
+for(const c of world.crystals){if(!c.alive)continue;const X=sx(c.x),Y=sy(c.y);if(X<-30||Y<-30||X>W+30||Y>H+30)continue;ctx.save();ctx.translate(X,Y);ctx.rotate(c.t);ctx.shadowColor='#6ee7ff';ctx.shadowBlur=18;ctx.fillStyle='#9cf5ff';ctx.beginPath();ctx.moveTo(0,-c.r*1.5);ctx.lineTo(c.r*.7,0);ctx.lineTo(0,c.r*1.5);ctx.lineTo(-c.r*.7,0);ctx.closePath();ctx.fill();ctx.restore()}
+for(const n of world.npcs){const X=sx(n.x),Y=sy(n.y);if(X<-60||Y<-60||X>W+60||Y>H+60)continue;drawNPC(X,Y,n)}
+for(const p of world.particles){const X=sx(p.x),Y=sy(p.y);ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(X,Y,2.1,0,TAU);ctx.fill()}ctx.globalAlpha=1;drawPlayer(W/2,H/2);
+if(player.pulse>0){ctx.strokeStyle='rgba(103,232,249,'+(player.pulse*1.6)+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(W/2,H/2,(.48-player.pulse)*260,0,TAU);ctx.stroke()}
+if(buildMode){ctx.strokeStyle='rgba(103,232,249,.23)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(W/2,H/2,330,0,TAU);ctx.stroke()}
+if(weather==='rain'){ctx.strokeStyle='rgba(150,205,255,.32)';ctx.lineWidth=1;for(let i=0;i<80;i++){const x=(i*73+time*110)%W,y=(i*127+time*370)%H;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-7,y+18);ctx.stroke()}}
+if(theme==='neon'){const grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'rgba(67,56,202,.07)');grad.addColorStop(1,'rgba(0,220,255,.025)');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H)}drawMini()}
+function drawPlayer(X,Y){ctx.save();ctx.translate(X,Y);ctx.rotate(player.dir);ctx.shadowColor='#7de8ff';ctx.shadowBlur=22;ctx.fillStyle='#d9fbff';ctx.beginPath();ctx.arc(0,0,15,0,TAU);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#4c65ff';ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-6,-8);ctx.lineTo(-3,8);ctx.closePath();ctx.fill();ctx.restore()}
+function drawNPC(X,Y,n){ctx.save();ctx.translate(X,Y);ctx.shadowColor='hsl('+n.hue+' 85% 65%)';ctx.shadowBlur=15;ctx.fillStyle='hsl('+n.hue+' 80% 67%)';ctx.beginPath();ctx.arc(0,0,12,0,TAU);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='rgba(6,9,20,.88)';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(n.name,0,-20);if(dist(n,player)<115){ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='9px system-ui';ctx.fillText('E · talk',0,28)}ctx.restore()}
+function drawBeacon(X,Y,s){ctx.save();ctx.translate(X,Y);const pulse=.5+.5*Math.sin(time*3+s.t*.001);ctx.strokeStyle='rgba(171,133,255,'+(.35+.35*pulse)+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,24+8*pulse,0,TAU);ctx.stroke();ctx.fillStyle='#a98cff';ctx.fillRect(-5,-28,10,42);ctx.fillStyle='#d8ccff';ctx.beginPath();ctx.arc(0,-28,8,0,TAU);ctx.fill();ctx.restore()}
+function drawMini(){const mw=132,mh=132;mctx.clearRect(0,0,mw,mh);mctx.fillStyle='rgba(3,7,15,.9)';mctx.fillRect(0,0,mw,mh);for(const c of world.crystals){if(!c.alive)continue;mctx.fillStyle='#67e8f9';mctx.fillRect(c.x/world.w*mw,c.y/world.h*mh,1.5,1.5)}for(const s of world.structures){mctx.fillStyle='#b79cff';mctx.fillRect(s.x/world.w*mw-1,s.y/world.h*mh-1,3,3)}mctx.fillStyle='#fff';mctx.beginPath();mctx.arc(player.x/world.w*mw,player.y/world.h*mh,3,0,TAU);mctx.fill()}
+function frame(now){const dt=Math.min(.033,(now-last)/1000);last=now;update(dt);draw();requestAnimationFrame(frame)}requestAnimationFrame(frame);
+addEventListener('keydown',e=>{if(document.activeElement===document.getElementById('aiInput'))return;const k=e.key.toLowerCase();keys.add(k);if(k==='e')pulse();if(k==='b')toggleBuild();if(k==='shift')dash();});addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+canvas.addEventListener('pointerdown',e=>{if(!buildMode)return;placeBeacon(view.x+(e.clientX-W/2),view.y+(e.clientY-H/2))});
+document.getElementById('pulseBtn').onclick=pulse;document.getElementById('buildBtn').onclick=toggleBuild;document.getElementById('dashBtn').onclick=dash;document.getElementById('mPulse').onclick=pulse;document.getElementById('mBuild').onclick=toggleBuild;document.getElementById('mDash').onclick=dash;
+const joy=document.getElementById('joy'),knob=document.getElementById('knob');let joyId=null;function joyMove(e){const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,m=Math.hypot(dx,dy),lim=36,scale=m>lim?lim/m:1;knob.style.transform='translate('+(dx*scale)+'px,'+(dy*scale)+'px)';input.x=clamp(dx/lim,-1,1);input.y=clamp(dy/lim,-1,1)}joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(e.pointerId);joyMove(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)joyMove(e)});function joyEnd(e){if(e.pointerId!==joyId)return;joyId=null;input.x=input.y=0;knob.style.transform='none'}joy.addEventListener('pointerup',joyEnd);joy.addEventListener('pointercancel',joyEnd);
+function worldAI(){const el=document.getElementById('aiInput'),q=el.value.trim().toLowerCase();if(!q)return;if(q.includes('forest')||q.includes('jungle')){theme='forest';toast('World AI: biome shifted to forest')}else if(q.includes('desert')||q.includes('mars')){theme='desert';toast('World AI: arid biome generated')}else if(q.includes('ice')||q.includes('snow')){theme='ice';toast('World AI: frozen biome generated')}else if(q.includes('neon')||q.includes('night')||q.includes('cyber')){theme='neon';toast('World AI: neon night enabled')}else if(q.includes('rain')||q.includes('storm')){weather='rain';toast('World AI: rain simulation enabled')}else if(q.includes('clear')||q.includes('sun')){weather='clear';toast('World AI: weather cleared')}else if(q.includes('spawn')||q.includes('wanderer')||q.includes('npc')){const base=world.npcs.length;for(let i=0;i<8;i++)world.npcs.push({x:player.x-250+Math.random()*500,y:player.y-250+Math.random()*500,vx:0,vy:0,t:0,name:['Nova','Echo','Kai','Sol'][i%4]+(base+i),spoken:false,hue:180+Math.random()*120});toast('World AI: 8 wanderers spawned')}else if(q.includes('shard')||q.includes('crystal')){for(let i=0;i<14;i++)world.crystals.push({x:player.x-300+Math.random()*600,y:player.y-300+Math.random()*600,r:8+Math.random()*5,t:Math.random()*TAU,alive:true});toast('World AI: shard field manifested')}else{toast('World AI interpreted: “'+q.slice(0,42)+'”')}el.value='';save()}
+document.getElementById('aiBtn').onclick=worldAI;document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();worldAI()}});
+setTimeout(()=>{document.getElementById('tip').style.opacity=.25},7500);updateQuest();
+})();
 </script>
 </body>
 </html>
