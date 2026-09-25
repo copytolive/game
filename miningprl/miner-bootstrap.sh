@@ -61,7 +61,18 @@ done
 export PRL_ACTUAL_GPU="$GPU_NAME"
 post_status "gpu_detected" "" "GPU terdeteksi"
 
-if [[ "${GPU_NAME,,}" != "${PRL_EXPECTED_GPU,,}" ]]; then
+gpu_compatible() {
+    local expected="${1,,}" actual="${2,,}"
+    [[ "$actual" == "$expected" ]] && return 0
+    case "$expected" in
+        *"rtx 2060") [[ "$actual" == *"rtx 2060 super" ]] && return 0 ;;
+        *"rtx 2070") [[ "$actual" == *"rtx 2070 super" ]] && return 0 ;;
+        *"rtx 2080") [[ "$actual" == *"rtx 2080 super" ]] && return 0 ;;
+    esac
+    return 1
+}
+
+if ! gpu_compatible "$PRL_EXPECTED_GPU" "$GPU_NAME"; then
     # Keep reporting until the control plane has observed this fresh Salad
     # instance. A one-shot heartbeat can arrive before the Salad poller and be
     # (correctly) rejected as stale, which would otherwise leave a paid but
@@ -149,6 +160,21 @@ timeout = int(os.environ.get("PRL_POOL_TIMEOUT_SECONDS", "600"))
 started = time.monotonic()
 samples = []
 
+def gpu_compatible(expected, actual):
+    expected = expected.strip().lower()
+    actual = actual.strip().lower()
+    if actual == expected:
+        return True
+    upgrades = {
+        "rtx 2060": "rtx 2060 super",
+        "rtx 2070": "rtx 2070 super",
+        "rtx 2080": "rtx 2080 super",
+    }
+    for base, upgrade in upgrades.items():
+        if expected.endswith(base) and actual.endswith(upgrade):
+            return True
+    return False
+
 def post(stage, hashrate=None, message=""):
     payload = {
         "group": os.environ.get("SALAD_CONTAINER_GROUP_NAME", ""),
@@ -188,7 +214,7 @@ while True:
         gpu_info = found.get("gpu_info") or []
         pool_gpu = str(gpu_info[0].get("name") or "") if gpu_info else ""
         hashrate = sum(float(g.get("hashrate") or 0) for g in gpu_info) / 1e12
-        if pool_gpu and pool_gpu.lower() != expected_gpu.lower():
+        if pool_gpu and not gpu_compatible(expected_gpu, pool_gpu):
             post("gpu_mismatch", hashrate, f"Pool GPU {pool_gpu}; expected {expected_gpu}")
         elif elapsed >= warmup:
             samples.append(hashrate)
