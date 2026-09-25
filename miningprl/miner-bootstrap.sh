@@ -10,9 +10,10 @@ set -Eeuo pipefail
 
 GPU=0
 DIR="${PRL_MINER_DIR:-/root/prl-pearlhash}"
-WILDRIG_VERSION="${WILDRIG_VERSION:-0.51.2}"
+WILDRIG_VERSION="${WILDRIG_VERSION:-0.51.3}"
 WILDRIG_FILE="wildrig-multi-linux-${WILDRIG_VERSION}.tar.gz"
 WILDRIG_URL="https://github.com/andru-kun/wildrig-multi/releases/download/${WILDRIG_VERSION}/${WILDRIG_FILE}"
+WILDRIG_SHA256="${WILDRIG_SHA256:-85db1069b807d78b2a766dcceb8b92c0745ac4e1315a400d6ebdcc1832b25e27}"
 POOL_URL="${PRL_POOL_URL:-stratum+tcp://pool.pearlhash.xyz:9000}"
 ACCOUNT_URL="https://pearlhash.xyz/api/account/${PRL_WALLET}"
 STARTED_AT="$(date +%s)"
@@ -101,6 +102,10 @@ BIN="$(find "$DIR" -type f \( -name wildrig-multi -o -name wildrig \) 2>/dev/nul
 if [ -z "$BIN" ]; then
     curl -fL --retry 5 --retry-delay 2 --connect-timeout 20 \
         -o "$WILDRIG_FILE" "$WILDRIG_URL"
+    printf '%s  %s\n' "$WILDRIG_SHA256" "$WILDRIG_FILE" | sha256sum -c - || {
+        post_status "bootstrap_failed" "" "Checksum WildRig ${WILDRIG_VERSION} tidak cocok"
+        exit 1
+    }
     tar -xzf "$WILDRIG_FILE"
     BIN="$(find "$DIR" -type f \( -name wildrig-multi -o -name wildrig \) 2>/dev/null | head -n1 || true)"
 fi
